@@ -23,9 +23,10 @@ public class PayloadHub : Hub
         return base.OnDisconnectedAsync(exception);
     }
 
-    public void Command1()
+    public void SendCommand(string commandType)
     {
-        Clients.All.SendAsync("messageReceived", RandomColor());
+        _logger.LogInformation("Command {Command} invoked", commandType);
+        Clients.All.SendAsync("receiveReport", RandomColor(), commandType);
     }
 
     private static string RandomColor()

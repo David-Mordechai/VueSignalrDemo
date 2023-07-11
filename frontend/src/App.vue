@@ -1,39 +1,38 @@
 <script setup lang="ts">
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { ref, onUnmounted } from 'vue';
+import SignalrService from './signalrService'
 
-const btnColor = ref('');
+const socket = new SignalrService("http://localhost:40001/ws/").start();
 
-const connection = new HubConnectionBuilder()
-  .withUrl("http://localhost:40001/ws/", {
-    withCredentials: false
-  })
-  .withAutomaticReconnect()
-  .configureLogging(LogLevel.Information)
-  .build();
+const command1BtnColor = ref('');
+const command2BtnColor = ref('');
 
-connection.on("messageReceived", (color) => {
-  console.log(color);
-  btnColor.value = color
-});
+function sendCommand(command: string) {
+  socket.SendCommand(command);
+}
 
-console.log(connection.state);
-
-connection.start().catch((err) => console.log(err));
-
-function command1() {
-  console.log('command1 clicked');
-  connection.send('command1');
+socket.ReceiveReport = (color: string, command: string) => {
+  switch (command) {
+    case 'command1':
+      command1BtnColor.value = color;
+      break;
+    case 'command2':
+      command2BtnColor.value = color;
+      break;
+    default:
+      break;
+  }
 }
 
 onUnmounted(() => {
-  connection.stop();
+  socket.stop();
 })
 </script>
 
 <template>
   <div>
-    <button @click="command1" :style="{ backgroundColor: btnColor }">Command1</button>
+    <button @click="sendCommand('command1')" :style="{ backgroundColor: command1BtnColor }">Command1</button>
+    <button @click="sendCommand('command2')" :style="{ backgroundColor: command2BtnColor }">Command2</button>
   </div>
 </template>
 
