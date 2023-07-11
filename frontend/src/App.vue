@@ -1,30 +1,40 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { ref, onUnmounted } from 'vue';
+
+const btnColor = ref('');
+
+const connection = new HubConnectionBuilder()
+  .withUrl("http://localhost:40001/ws/", {
+    withCredentials: false
+  })
+  .withAutomaticReconnect()
+  .configureLogging(LogLevel.Information)
+  .build();
+
+connection.on("messageReceived", (color) => {
+  console.log(color);
+  btnColor.value = color
+});
+
+console.log(connection.state);
+
+connection.start().catch((err) => console.log(err));
+
+function command1() {
+  console.log('command1 clicked');
+  connection.send('command1');
+}
+
+onUnmounted(() => {
+  connection.stop();
+})
 </script>
 
 <template>
   <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+    <button @click="command1" :style="{ backgroundColor: btnColor }">Command1</button>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<style scoped></style>
