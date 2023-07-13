@@ -35,7 +35,7 @@ onUnmounted(async () => {
 })
 
 function sendCommand(command: string) {
-  socket.SendCommand(command);
+  socket.sendCommand(command);
 }
 </script>
 

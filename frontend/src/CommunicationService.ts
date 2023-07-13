@@ -1,4 +1,6 @@
 import { HubConnectionBuilder, LogLevel, HubConnection, HubConnectionState, IRetryPolicy, RetryContext } from '@microsoft/signalr';
+
+/**Signalr reliable communication to backend server with reconnect retry policy*/
 export default class CommunicationService {
 
     ReceiveReport: ((color: string, command: string) => void) | undefined;
@@ -38,7 +40,7 @@ export default class CommunicationService {
         this.ConnectionState?.call(this, false);
     }
 
-    SendCommand = (commandType: string) => this.connection.send('sendCommand', commandType);
+    sendCommand = (commandType: string) => this.connection.send('sendCommand', commandType);
     
 }
 
