@@ -21,14 +21,13 @@ export default class CommunicationService {
     }
 
     async start() {
-        let timeoutId: number | undefined;
         try {
             await this.connection.start();
             this.ConnectionState?.call(this, true);
         } catch (error) {
             console.log(`Signalr fail to connect. Attempt to reconnect after 1 minute`)
             this.ConnectionState?.call (this, false);
-            timeoutId = setTimeout(async () =>  {
+            setTimeout(async () =>  {
                 await this.start();
             }, 1000 * 60);
         }
